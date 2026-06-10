@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>力学演習A｜微分方程式 穴埋めクイズ</title>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script"></script>
+<style>
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--border:#30363d;
+  --text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--accent2:#79c0ff;
+  --green:#3fb950;--red:#f85149;--yellow:#d29922;--purple:#bc8cff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI','Hiragino Sans','Noto Sans JP',sans-serif;font-size:15px;line-height:1.7;min-height:100vh;}
+
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:18px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;}
+.hbadge{background:linear-gradient(135deg,#58a6ff1a,#bc8cff1a);border:1px solid #58a6ff44;color:var(--accent);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:20px;}
+header h1{font-size:17px;font-weight:600;}
+.hsub{font-size:12px;color:var(--muted);margin-left:auto;}
+
+#sstrip{background:var(--bg3);border-bottom:1px solid var(--border);padding:9px 28px;display:flex;gap:22px;font-size:13px;color:var(--muted);}
+.sv{color:var(--accent);font-weight:700;font-size:15px;}
+
+.tabbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;display:flex;overflow-x:auto;scrollbar-width:none;}
+.tabbar::-webkit-scrollbar{display:none;}
+.tbtn{background:none;border:none;border-bottom:3px solid transparent;color:var(--muted);cursor:pointer;font-size:13px;font-weight:500;padding:13px 18px 10px;white-space:nowrap;transition:color .2s,border-color .2s;}
+.tbtn:hover{color:var(--text);}
+.tbtn.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+main{max-width:860px;margin:0 auto;padding:28px 20px 80px;}
+.tpanel{display:none;}.tpanel.active{display:block;}
+
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:18px;padding-bottom:7px;border-bottom:1px solid var(--border);}
+
+/* Card */
+.qcard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden;transition:border-color .2s;}
+.qcard.ok{border-color:var(--green);}.qcard.ng{border-color:var(--red);}
+.qhdr{padding:15px 18px 10px;display:flex;align-items:flex-start;gap:11px;}
+.qnum{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--accent);font-size:11px;font-weight:700;padding:3px 8px;white-space:nowrap;margin-top:2px;flex-shrink:0;}
+.qtext{font-size:14px;line-height:1.9;flex:1;}
+
+/* Blank chips */
+.blank{display:inline-block;background:#58a6ff12;border:1.5px dashed var(--accent);border-radius:4px;color:var(--accent2);font-weight:700;min-width:34px;padding:1px 7px;text-align:center;font-family:monospace;font-size:13px;vertical-align:middle;}
+.blank.ok2{background:#3fb95018;border-color:var(--green);color:var(--green);border-style:solid;}
+.blank.ng2{background:#f8514918;border-color:var(--red);color:var(--red);border-style:solid;}
+
+/* Choices */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:2px 18px 14px;}
+.cbtn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:13px;padding:9px 12px;text-align:left;transition:background .15s,border-color .15s;line-height:1.6;}
+.cbtn:hover:not(:disabled){background:#21262d;border-color:var(--accent);}
+.cbtn:disabled{cursor:default;}
+.cbtn.sc{background:#3fb95018;border-color:var(--green);color:var(--green);}
+.cbtn.sw{background:#f8514918;border-color:var(--red);color:var(--red);}
+.cbtn.rc{background:#3fb95010;border-color:var(--green);}
+.lbl{font-size:10px;font-weight:700;opacity:.45;margin-right:5px;}
+
+/* Feedback */
+.fb{margin:0 18px 12px;padding:9px 13px;border-radius:7px;font-size:13px;display:none;}
+.fb.ok{background:#3fb95014;border:1px solid var(--green);color:#7ee787;display:block;}
+.fb.ng{background:#f8514914;border:1px solid var(--red);color:#ffa198;display:block;}
+
+/* Answer box */
+.arow{padding:0 18px 12px;display:flex;align-items:center;}
+.rbtn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;font-size:12px;padding:5px 12px;transition:all .15s;}
+.rbtn:hover{border-color:var(--accent);color:var(--accent);}
+.abox{display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin:0 18px 14px;padding:12px 15px;font-size:13px;line-height:1.8;}
+.abox.vis{display:block;}
+.albl{color:var(--yellow);font-weight:700;font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.expl{color:var(--muted);margin-top:6px;line-height:1.75;}
+
+/* Tutorial */
+.tutorial{margin-top:36px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:26px 28px;}
+.ttitle{font-size:16px;font-weight:700;color:var(--accent);margin-bottom:5px;}
+.tintro{color:var(--muted);font-size:13px;margin-bottom:24px;}
+.step{margin-bottom:28px;}
+.slbl{display:inline-flex;align-items:center;background:linear-gradient(135deg,#58a6ff18,#bc8cff18);border:1px solid #58a6ff40;border-radius:20px;color:var(--accent);font-size:11px;font-weight:700;letter-spacing:.1em;padding:3px 12px;margin-bottom:8px;text-transform:uppercase;}
+.step h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px;margin-top:4px;}
+.step p,.step ul,.step ol{font-size:13px;color:var(--muted);margin-bottom:7px;line-height:1.8;}
+.step ul,.step ol{padding-left:18px;}
+.step li{margin-bottom:3px;}
+.mblk{background:var(--bg3);border-left:3px solid var(--accent);border-radius:0 7px 7px 0;margin:10px 0;overflow-x:auto;padding:12px 18px;font-size:14px;}
+.pbox{background:#58a6ff0c;border:1px solid #58a6ff2a;border-radius:7px;padding:11px 14px;margin:10px 0;font-size:13px;color:var(--text);}
+.pbox .pt{color:var(--accent);font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;}
+.kbox{background:#bc8cff0c;border:1px solid #bc8cff2a;border-radius:7px;padding:13px 16px;margin-top:18px;}
+.kbox .kt{color:var(--purple);font-weight:700;font-size:13px;margin-bottom:8px;}
+.kbox ul{padding-left:16px;}
+.kbox li{color:var(--text);font-size:13px;margin-bottom:4px;}
+</style>
+</head>
+<body>
+<header>
+  <span class="hbadge">力学演習A</span>
+  <h1>微分方程式 穴埋めクイズ</h1>
+  <span class="hsub">2026年4月27日 — 第3回</span>
+</header>
+<div id="sstrip">
+  <span>正解数：<span class="sv" id="cc">0</span></span>
+  <span>回答数：<span class="sv" id="ac">0</span></span>
+  <span>正答率：<span class="sv" id="rt">—</span></span>
+</div>
+<div class="tabbar">
+  <button class="tbtn active" onclick="swTab(0)">① マクローリン展開</button>
+  <button class="tbtn" onclick="swTab(1)">② 常微分方程式</button>
+  <button class="tbtn" onclick="swTab(2)">③ 連立微分方程式</button>
+</div>
+<main>
+
+<!-- ======================================================
+     TAB 0  マクローリン展開
+     ====================================================== -->
+<div class="tpanel active" id="tp0">
+<div class="sec-title">問題 1 — マクローリン展開</div>
+
+<!-- 1-1 -->
+<div class="qcard" id="q1">
+  <div class="qhdr"><span class="qnum">1-1</span>
+    <div class="qtext">
+      \(y = e^x\) を \(n=2\) 次まで展開すると：<br>
+      \(e^x \approx 1 + \)<span class="blank" id="b1a">ア</span>\( + \)<span class="blank" id="b1b">イ</span>
+    </div>
+  </div>
+  <div class="choices" id="c1">
+    <button class="cbtn" onclick="ans(1,'b',1)"><span class="lbl">a</span>\(2x\) と \(\dfrac{x^2}{4}\)</button>
+    <button class="cbtn" onclick="ans(1,'a',2)"><span class="lbl">b</span>\(x\) と \(\dfrac{x^2}{2}\)</button>
+    <button class="cbtn" onclick="ans(1,'c',3)"><span class="lbl">c</span>\(x\) と \(\dfrac{x^3}{6}\)</button>
+    <button class="cbtn" onclick="ans(1,'d',4)"><span class="lbl">d</span>\(x^2\) と \(x^3\)</button>
+  </div>
+  <div class="fb" id="fb1"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a1')">答えを見る</button></div>
+  <div class="abox" id="a1">
+    <div class="albl">解答・解説</div>
+    <div>\(e^x = \displaystyle\sum_{n=0}^{\infty}\frac{x^n}{n!} = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots\)</div>
+    <div class="expl">\(n=2\) で打ち切ると \(1 + x + \dfrac{x^2}{2}\)。各項の分母は \(n!\) であることに注意。</div>
+  </div>
+</div>
+
+<!-- 1-2 -->
+<div class="qcard" id="q2">
+  <div class="qhdr"><span class="qnum">1-2</span>
+    <div class="qtext">
+      \(y = \sin x\) を \(n=5\) 次まで展開すると：<br>
+      \(\sin x \approx x - \)<span class="blank" id="b2a">ア</span>\( + \)<span class="blank" id="b2b">イ</span>
+    </div>
+  </div>
+  <div class="choices" id="c2">
+    <button class="cbtn" onclick="ans(2,'c',1)"><span class="lbl">a</span>\(\dfrac{x^3}{3}\) と \(\dfrac{x^5}{60}\)</button>
+    <button class="cbtn" onclick="ans(2,'d',2)"><span class="lbl">b</span>\(\dfrac{x^2}{2}\) と \(\dfrac{x^4}{24}\)</button>
+    <button class="cbtn" onclick="ans(2,'a',3)"><span class="lbl">c</span>\(\dfrac{x^3}{6}\) と \(\dfrac{x^5}{120}\)</button>
+    <button class="cbtn" onclick="ans(2,'b',4)"><span class="lbl">d</span>\(\dfrac{x^3}{6}\) と \(\dfrac{x^5}{100}\)</button>
+  </div>
+  <div class="fb" id="fb2"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a2')">答えを見る</button></div>
+  <div class="abox" id="a2">
+    <div class="albl">解答・解説</div>
+    <div>\(\sin x = x - \dfrac{x^3}{3!} + \dfrac{x^5}{5!} - \cdots = x - \dfrac{x^3}{6} + \dfrac{x^5}{120}\)</div>
+    <div class="expl">奇数次のみ現れ、符号が交互に変わる。\(3!=6,\;5!=120\)。</div>
+  </div>
+</div>
+
+<!-- 1-3 -->
+<div class="qcard" id="q3">
+  <div class="qhdr"><span class="qnum">1-3</span>
+    <div class="qtext">
+      \(y = \cos x\) を \(n=4\) 次まで展開すると：<br>
+      \(\cos x \approx 1 - \)<span class="blank" id="b3a">ア</span>\( + \)<span class="blank" id="b3b">イ</span>
+    </div>
+  </div>
+  <div class="choices" id="c3">
+    <button class="cbtn" onclick="ans(3,'a',1)"><span class="lbl">a</span>\(\dfrac{x^2}{2}\) と \(\dfrac{x^4}{24}\)</button>
+    <button class="cbtn" onclick="ans(3,'c',2)"><span class="lbl">b</span>\(\dfrac{x^2}{6}\) と \(\dfrac{x^4}{24}\)</button>
+    <button class="cbtn" onclick="ans(3,'d',3)"><span class="lbl">c</span>\(x^2\) と \(x^4\)</button>
+    <button class="cbtn" onclick="ans(3,'b',4)"><span class="lbl">d</span>\(\dfrac{x^2}{2}\) と \(\dfrac{x^4}{48}\)</button>
+  </div>
+  <div class="fb" id="fb3"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a3')">答えを見る</button></div>
+  <div class="abox" id="a3">
+    <div class="albl">解答・解説</div>
+    <div>\(\cos x = 1 - \dfrac{x^2}{2!} + \dfrac{x^4}{4!} - \cdots = 1 - \dfrac{x^2}{2} + \dfrac{x^4}{24}\)</div>
+    <div class="expl">偶数次のみ現れる。\(2!=2,\;4!=24\)。</div>
+  </div>
+</div>
+
+<!-- 1-4 -->
+<div class="qcard" id="q4">
+  <div class="qhdr"><span class="qnum">1-4</span>
+    <div class="qtext">
+      \(y = (1+x)^a\) を \(n=2\) 次まで展開すると：<br>
+      \((1+x)^a \approx 1 + \)<span class="blank" id="b4a">ア</span>\( + \)<span class="blank" id="b4b">イ</span>
+    </div>
+  </div>
+  <div class="choices" id="c4">
+    <button class="cbtn" onclick="ans(4,'c',1)"><span class="lbl">a</span>\(a^2 x\) と \(a x^2\)</button>
+    <button class="cbtn" onclick="ans(4,'b',2)"><span class="lbl">b</span>\(ax\) と \(\dfrac{a^2}{2}x^2\)</button>
+    <button class="cbtn" onclick="ans(4,'d',3)"><span class="lbl">c</span>\(ax\) と \(\dfrac{a(a+1)}{2}x^2\)</button>
+    <button class="cbtn" onclick="ans(4,'a',4)"><span class="lbl">d</span>\(ax\) と \(\dfrac{a(a-1)}{2}x^2\)</button>
+  </div>
+  <div class="fb" id="fb4"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a4')">答えを見る</button></div>
+  <div class="abox" id="a4">
+    <div class="albl">解答・解説</div>
+    <div>\((1+x)^a = 1 + ax + \dfrac{a(a-1)}{2!}x^2 + \cdots\)</div>
+    <div class="expl">\(f''(0) = a(a-1)\) より係数は \(\dfrac{a(a-1)}{2}\)。\(a=2\) のときは通常の二項定理と一致する。</div>
+  </div>
+</div>
+
+<!-- Tutorial 1 -->
+<div class="tutorial">
+  <div class="ttitle">📐 マクローリン展開 — ステップバイステップ解説</div>
+  <div class="tintro">マクローリン展開の原理から各公式の導き方まで丁寧に説明します。</div>
+
+  <div class="step">
+    <div class="slbl">Step 1</div>
+    <h3>テイラー展開・マクローリン展開とは</h3>
+    <p>滑らかな関数 \(f(x)\) は点 \(x=a\) の周りでべき級数に展開できます（テイラー展開）：</p>
+    <div class="mblk">$$f(x) = \sum_{n=0}^{\infty} \frac{f^{(n)}(a)}{n!}(x-a)^n$$</div>
+    <p>特に \(a=0\) とした場合を <strong>マクローリン展開</strong> と呼びます：</p>
+    <div class="mblk">$$f(x) = f(0) + f'(0)x + \frac{f''(0)}{2!}x^2 + \frac{f'''(0)}{3!}x^3 + \cdots$$</div>
+    <div class="pbox"><div class="pt">階乗の値</div>\(0!=1,\;1!=1,\;2!=2,\;3!=6,\;4!=24,\;5!=120\)</div>
+  </div>
+
+  <div class="step">
+    <div class="slbl">Step 2</div>
+    <h3>\(e^x\) の展開</h3>
+    <p>\(f(x)=e^x\) は何度微分しても \(e^x\) のまま。したがって \(f^{(n)}(0) = 1\)。</p>
+    <div class="mblk">$$e^x = \sum_{n=0}^{\infty}\frac{x^n}{n!} = 1 + x + \frac{x^2}{2} + \frac{x^3}{6} + \cdots$$</div>
+    <p>\(n=2\) で打ち切ると \(e^x \approx 1 + x + \dfrac{x^2}{2}\)。</p>
+  </div>
+
+  <div class="step">
+    <div class="slbl">Step 3</div>
+    <h3>\(\sin x\) と \(\cos x\) の展開</h3>
+    <p>\(\sin x\) の微分サイクル：\(\sin x \to \cos x \to -\sin x \to -\cos x \to \sin x \to \cdots\)</p>
+    <p>\(x=0\) での値：\(0, 1, 0, -1, 0, 1, \ldots\) → 奇数次のみ残る</p>
+    <div class="mblk">$$\sin x = x - \frac{x^3}{6} + \frac{x^5}{120} - \cdots$$</div>
+    <div class="mblk">$$\cos x = 1 - \frac{x^2}{2} + \frac{x^4}{24} - \cdots$$</div>
+  </div>
+
+  <div class="step">
+    <div class="slbl">Step 4</div>
+    <h3>二項展開 \((1+x)^a\)</h3>
+    <ul>
+      <li>\(f(x)=(1+x)^a\) → \(f(0)=1\)</li>
+      <li>\(f'(x)=a(1+x)^{a-1}\) → \(f'(0)=a\)</li>
+      <li>\(f''(x)=a(a-1)(1+x)^{a-2}\) → \(f''(0)=a(a-1)\)</li>
+    </ul>
+    <div class="mblk">$$(1+x)^a = 1 + ax + \frac{a(a-1)}{2}x^2 + \cdots$$</div>
+    <div class="pbox"><div class="pt">使用例（物理頻出）</div>\(a=\frac{1}{2}\) のとき：\(\sqrt{1+x} \approx 1 + \dfrac{x}{2} - \dfrac{x^2}{8}\)</div>
+  </div>
+
+  <div class="kbox">
+    <div class="kt">🔑 キーポイントまとめ</div>
+    <ul>
+      <li>係数の分母は必ず \(n!\) — これを忘れると全部間違える</li>
+      <li>\(\sin x\) は奇数次のみ、\(\cos x\) は偶数次のみ</li>
+      <li>符号は \(-,+,-,+,\ldots\) と交互（\(\sin\)・\(\cos\) 共通）</li>
+      <li>二項展開の係数は \(\dfrac{a(a-1)(a-2)\cdots}{n!}\) の形（\(a\) は任意の実数でよい）</li>
+    </ul>
+  </div>
+</div>
+</div><!-- /tp0 -->
+
+
+<!-- ======================================================
+     TAB 1  常微分方程式
+     ====================================================== -->
+<div class="tpanel" id="tp1">
+<div class="sec-title">問題 2 — 常微分方程式</div>
+
+<!-- 2-1 -->
+<div class="qcard" id="q5">
+  <div class="qhdr"><span class="qnum">2-1</span>
+    <div class="qtext">
+      \(\dfrac{dx}{dt} = -11x\) の一般解は：<br>
+      \(x(t) = C\,e^{\,\square\, t}\) &nbsp;（\(\square\) =&nbsp;<span class="blank" id="b5">ア</span>&nbsp;）
+    </div>
+  </div>
+  <div class="choices" id="c5">
+    <button class="cbtn" onclick="ans(5,'b',1)"><span class="lbl">a</span>\(11\)</button>
+    <button class="cbtn" onclick="ans(5,'a',2)"><span class="lbl">b</span>\(-11\)</button>
+    <button class="cbtn" onclick="ans(5,'c',3)"><span class="lbl">c</span>\(0\)</button>
+    <button class="cbtn" onclick="ans(5,'d',4)"><span class="lbl">d</span>\(-1\)</button>
+  </div>
+  <div class="fb" id="fb5"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a5')">答えを見る</button></div>
+  <div class="abox" id="a5">
+    <div class="albl">解答・解説</div>
+    <div>変数分離：\(\dfrac{dx}{x}=-11\,dt\) → 積分：\(\ln|x|=-11t+\text{const}\) → \(x=Ce^{-11t}\)</div>
+    <div class="expl">係数が負なので時間とともに 0 に収束する指数的減衰。</div>
+  </div>
+</div>
+
+<!-- 2-2 -->
+<div class="qcard" id="q6">
+  <div class="qhdr"><span class="qnum">2-2</span>
+    <div class="qtext">
+      \(\dfrac{d^2x}{dt^2} = 2\sin 3t\) の一般解は：<br>
+      \(x(t) = -\dfrac{2}{9}\) <span class="blank" id="b6a">ア</span> \(3t + C_1 t + C_2\)
+    </div>
+  </div>
+  <div class="choices" id="c6">
+    <button class="cbtn" onclick="ans(6,'c',1)"><span class="lbl">a</span>\(\cos\)</button>
+    <button class="cbtn" onclick="ans(6,'a',2)"><span class="lbl">b</span>\(\sin\)</button>
+    <button class="cbtn" onclick="ans(6,'b',3)"><span class="lbl">c</span>\(\tan\)</button>
+    <button class="cbtn" onclick="ans(6,'d',4)"><span class="lbl">d</span>\(\cot\)</button>
+  </div>
+  <div class="fb" id="fb6"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a6')">答えを見る</button></div>
+  <div class="abox" id="a6">
+    <div class="albl">解答・解説</div>
+    <div>1 回積分：\(\dfrac{dx}{dt} = -\dfrac{2}{3}\cos 3t + C_1\)。もう 1 回積分：\(x = -\dfrac{2}{9}\sin 3t + C_1 t + C_2\)</div>
+    <div class="expl">\(\int \sin 3t\,dt = -\dfrac{1}{3}\cos 3t\)。さらに \(\int \cos 3t\,dt = \dfrac{1}{3}\sin 3t\)。</div>
+  </div>
+</div>
+
+<!-- 2-3 -->
+<div class="qcard" id="q7">
+  <div class="qhdr"><span class="qnum">2-3</span>
+    <div class="qtext">
+      \(\dfrac{d^2x}{dt^2} = -x + 2\) の一般解は：<br>
+      \(x(t) = C_1\sin t + C_2\cos t +\) <span class="blank" id="b7">ア</span>
+    </div>
+  </div>
+  <div class="choices" id="c7">
+    <button class="cbtn" onclick="ans(7,'c',1)"><span class="lbl">a</span>\(1\)</button>
+    <button class="cbtn" onclick="ans(7,'b',2)"><span class="lbl">b</span>\(-2\)</button>
+    <button class="cbtn" onclick="ans(7,'a',3)"><span class="lbl">c</span>\(2\)</button>
+    <button class="cbtn" onclick="ans(7,'d',4)"><span class="lbl">d</span>\(2t\)</button>
+  </div>
+  <div class="fb" id="fb7"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a7')">答えを見る</button></div>
+  <div class="abox" id="a7">
+    <div class="albl">解答・解説</div>
+    <div>特性方程式 \(\lambda^2+1=0\) → \(\lambda=\pm i\)（純虚数根）。斉次解：\(C_1\sin t+C_2\cos t\)。特解：\(x_p=2\)（代入して確認：\(0=-2+2=0\) ✓）。</div>
+    <div class="expl">一般解 = 斉次解 + 特解。</div>
+  </div>
+</div>
+
+<!-- 2-4 -->
+<div class="qcard" id="q8">
+  <div class="qhdr"><span class="qnum">2-4</span>
+    <div class="qtext">
+      \(\dfrac{d^2x}{dt^2}+3\dfrac{dx}{dt}+2x=0\) の特性方程式を因数分解すると：<br>
+      \((\lambda+\) <span class="blank" id="b8a">ア</span> \()(\lambda+\) <span class="blank" id="b8b">イ</span> \() = 0\)
+    </div>
+  </div>
+  <div class="choices" id="c8">
+    <button class="cbtn" onclick="ans(8,'b',1)"><span class="lbl">a</span>\(3\) と \(2\)</button>
+    <button class="cbtn" onclick="ans(8,'a',2)"><span class="lbl">b</span>\(1\) と \(2\)</button>
+    <button class="cbtn" onclick="ans(8,'d',3)"><span class="lbl">c</span>\(0\) と \(2\)</button>
+    <button class="cbtn" onclick="ans(8,'c',4)"><span class="lbl">d</span>\(-1\) と \(-2\)</button>
+  </div>
+  <div class="fb" id="fb8"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a8')">答えを見る</button></div>
+  <div class="abox" id="a8">
+    <div class="albl">解答・解説</div>
+    <div>\(\lambda^2+3\lambda+2=(\lambda+1)(\lambda+2)=0\) → \(\lambda=-1,\,-2\)</div>
+    <div class="expl">一般解：\(x(t)=C_1 e^{-t}+C_2 e^{-2t}\)（過減衰）。</div>
+  </div>
+</div>
+
+<!-- 2-5 -->
+<div class="qcard" id="q9">
+  <div class="qhdr"><span class="qnum">2-5</span>
+    <div class="qtext">
+      \(\dfrac{d^2x}{dt^2}+4\dfrac{dx}{dt}+4x=0\) の特性方程式の重根は \(\lambda =\) <span class="blank" id="b9a">ア</span><br>
+      一般解は \(x = (C_1 + C_2 t)\,e^{\,\square\, t}\) &nbsp;（\(\square\) =&nbsp;<span class="blank" id="b9b">イ</span>&nbsp;）
+    </div>
+  </div>
+  <div class="choices" id="c9">
+    <button class="cbtn" onclick="ans(9,'c',1)"><span class="lbl">a</span>\(\lambda=-4\)、指数部 \(-4\)</button>
+    <button class="cbtn" onclick="ans(9,'b',2)"><span class="lbl">b</span>\(\lambda=-2\)、指数部 \(-4\)</button>
+    <button class="cbtn" onclick="ans(9,'d',3)"><span class="lbl">c</span>\(\lambda=\pm 2i\)、指数部 \(\pm 2i\)</button>
+    <button class="cbtn" onclick="ans(9,'a',4)"><span class="lbl">d</span>\(\lambda=-2\)、指数部 \(-2\)</button>
+  </div>
+  <div class="fb" id="fb9"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a9')">答えを見る</button></div>
+  <div class="abox" id="a9">
+    <div class="albl">解答・解説</div>
+    <div>\(\lambda^2+4\lambda+4=(\lambda+2)^2=0\) → 重根 \(\lambda=-2\)</div>
+    <div class="expl">重根のとき一般解は \((C_1+C_2 t)e^{\lambda t}\)。\(te^{\lambda t}\) の項が加わるのが重根の特徴。</div>
+  </div>
+</div>
+
+<!-- 2-6 -->
+<div class="qcard" id="q10">
+  <div class="qhdr"><span class="qnum">2-6</span>
+    <div class="qtext">
+      \(\dfrac{d^2x}{dt^2}+3x=\cos 2t\) の特解を \(x_p=A\cos 2t\) とおくと \(A =\) <span class="blank" id="b10">ア</span>
+    </div>
+  </div>
+  <div class="choices" id="c10">
+    <button class="cbtn" onclick="ans(10,'d',1)"><span class="lbl">a</span>\(\dfrac{1}{3}\)</button>
+    <button class="cbtn" onclick="ans(10,'b',2)"><span class="lbl">b</span>\(1\)</button>
+    <button class="cbtn" onclick="ans(10,'a',3)"><span class="lbl">c</span>\(-1\)</button>
+    <button class="cbtn" onclick="ans(10,'c',4)"><span class="lbl">d</span>\(\dfrac{1}{5}\)</button>
+  </div>
+  <div class="fb" id="fb10"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a10')">答えを見る</button></div>
+  <div class="abox" id="a10">
+    <div class="albl">解答・解説</div>
+    <div>\(\ddot{x}_p=-4A\cos 2t\) を代入：\(-4A\cos 2t+3A\cos 2t=\cos 2t\) → \(-A=1\) → \(A=-1\)</div>
+    <div class="expl">特解 \(x_p=-\cos 2t\)。一般解 \(x=C_1\sin\sqrt{3}\,t+C_2\cos\sqrt{3}\,t-\cos 2t\)。</div>
+  </div>
+</div>
+
+<!-- 2-7 -->
+<div class="qcard" id="q11">
+  <div class="qhdr"><span class="qnum">2-7</span>
+    <div class="qtext">
+      \(\dfrac{d^2x}{dt^2}+3\dfrac{dx}{dt}+2x=\sin 3t\) の特解を \(x_p=A\sin 3t+B\cos 3t\) とおいて係数比較すると：<br>
+      \((A,\,B) =\) \(\bigl(\) <span class="blank" id="b11a">ア</span> , <span class="blank" id="b11b">イ</span> \(\bigr)\)
+    </div>
+  </div>
+  <div class="choices" id="c11">
+    <button class="cbtn" onclick="ans(11,'d',1)"><span class="lbl">a</span>\(\left(\dfrac{7}{130},\;\dfrac{9}{130}\right)\)</button>
+    <button class="cbtn" onclick="ans(11,'b',2)"><span class="lbl">b</span>\(\left(\dfrac{1}{10},\;-\dfrac{3}{10}\right)\)</button>
+    <button class="cbtn" onclick="ans(11,'c',3)"><span class="lbl">c</span>\(\left(-\dfrac{7}{130},\;-\dfrac{9}{130}\right)\)</button>
+    <button class="cbtn" onclick="ans(11,'a',4)"><span class="lbl">d</span>\(\left(-\dfrac{7}{130},\;\dfrac{9}{130}\right)\)</button>
+  </div>
+  <div class="fb" id="fb11"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a11')">答えを見る</button></div>
+  <div class="abox" id="a11">
+    <div class="albl">解答・解説</div>
+    <div>
+      \(\dot{x}_p=3A\cos 3t-3B\sin 3t\)、\(\ddot{x}_p=-9A\sin 3t-9B\cos 3t\) を代入：<br>
+      \(\sin 3t\) 係数：\(-9A-9B+2A=1\) → \(-7A-9B=1\)<br>
+      \(\cos 3t\) 係数：\(-9B+9A+2B=0\) → \(9A-7B=0\)<br>
+      連立して \(A=-\dfrac{7}{130},\;B=\dfrac{9}{130}\)
+    </div>
+    <div class="expl">待定係数法の標準手順。右辺に現れる関数と同じ形を特解として仮定する。</div>
+  </div>
+</div>
+
+<!-- Tutorial 2 -->
+<div class="tutorial">
+  <div class="ttitle">🔧 常微分方程式の解法 — ステップバイステップ解説</div>
+  <div class="tintro">変数分離から特性方程式、待定係数法まで体系的に整理します。</div>
+
+  <div class="step">
+    <div class="slbl">Step 1</div>
+    <h3>1 階線形 ODE：変数分離法</h3>
+    <p>\(\dfrac{dx}{dt}=f(t)\cdot g(x)\) の形なら変数分離が使えます。</p>
+    <div class="mblk">$$\frac{dx}{g(x)}=f(t)\,dt \;\Rightarrow\; \int\frac{dx}{g(x)}=\int f(t)\,dt+C$$</div>
+    <p>例：\(\dfrac{dx}{dt}=-11x\) → \(\dfrac{dx}{x}=-11\,dt\) → \(\ln|x|=-11t+C\) → \(x=Ce^{-11t}\)</p>
+  </div>
+
+  <div class="step">
+    <div class="slbl">Step 2</div>
+    <h3>2 階定係数 ODE：特性方程式</h3>
+    <p>\(a\ddot{x}+b\dot{x}+cx=0\) に \(x=e^{\lambda t}\) を代入すると：</p>
+    <div class="mblk">$$a\lambda^2+b\lambda+c=0 \quad\text{（特性方程式）}$$</div>
+    <ul>
+      <li><strong>相異なる実根</strong> \(\lambda_1\neq\lambda_2\)：\(x=C_1 e^{\lambda_1 t}+C_2 e^{\lambda_2 t}\)</li>
+      <li><strong>重根</strong> \(\lambda_1=\lambda_2=\lambda\)：\(x=(C_1+C_2 t)e^{\lambda t}\)</li>
+      <li><strong>複素根</strong> \(\lambda=\alpha\pm i\beta\)：\(x=e^{\alpha t}(C_1\cos\beta t+C_2\sin\beta t)\)</li>
+    </ul>
+    <div class="pbox"><div class="pt">判別式</div>\(D=b^2-4ac\)。\(D>0\)：実根2個、\(D=0\)：重根、\(D&lt;0\)：複素根。</div>
+  </div>
+
+  <div class="step">
+    <div class="slbl">Step 3</div>
+    <h3>非斉次方程式：待定係数法</h3>
+    <p>右辺に \(\sin\omega t\) や \(\cos\omega t\) がある場合、特解を仮定：</p>
+    <div class="mblk">$$x_p = A\sin\omega t + B\cos\omega t$$</div>
+    <p>代入して \(\sin\omega t\) 係数と \(\cos\omega t\) 係数を両辺で比較 → \(A,B\) を決定。</p>
+    <div class="mblk">$$x_{\text{一般}} = x_{\text{斉次}} + x_{\text{特解}}$$</div>
+  </div>
+
+  <div class="kbox">
+    <div class="kt">🔑 キーポイントまとめ</div>
+    <ul>
+      <li>特性方程式の根の種類（実・重・複素）で解の形が決まる</li>
+      <li>重根のときは \(te^{\lambda t}\) の項が現れる — 忘れがち！</li>
+      <li>非斉次の一般解 ＝ 斉次の一般解 ＋ 特解</li>
+      <li>待定係数法では右辺と同じ関数形を特解として仮定する</li>
+    </ul>
+  </div>
+</div>
+</div><!-- /tp1 -->
+
+
+<!-- ======================================================
+     TAB 2  連立微分方程式
+     ====================================================== -->
+<div class="tpanel" id="tp2">
+<div class="sec-title">問題 3 — 連立微分方程式</div>
+
+<!-- 3-1 -->
+<div class="qcard" id="q12">
+  <div class="qhdr"><span class="qnum">3-1</span>
+    <div class="qtext">
+      連立系 \(\ddot{x}=\dot{y},\;\ddot{y}=-\dot{x}\) において、①を \(t\) で微分して②を代入すると：<br>
+      \(\overset{...}{x} + \)<span class="blank" id="b12">ア</span>\( = 0\)
+    </div>
+  </div>
+  <div class="choices" id="c12">
+    <button class="cbtn" onclick="ans(12,'c',1)"><span class="lbl">a</span>\(\ddot{x}\)</button>
+    <button class="cbtn" onclick="ans(12,'b',2)"><span class="lbl">b</span>\(x\)</button>
+    <button class="cbtn" onclick="ans(12,'d',3)"><span class="lbl">c</span>\(\dot{x}\)</button>
+    <button class="cbtn" onclick="ans(12,'a',4)"><span class="lbl">d</span>\(\overset{...}{x}\)</button>
+  </div>
+  <div class="fb" id="fb12"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a12')">答えを見る</button></div>
+  <div class="abox" id="a12">
+    <div class="albl">解答・解説</div>
+    <div>①を微分：\(\overset{...}{x}=\ddot{y}\)。②より \(\ddot{y}=-\dot{x}\) を代入：\(\overset{...}{x}=-\dot{x}\)　→　\(\overset{...}{x}+\dot{x}=0\)</div>
+    <div class="expl">さらに 1 回微分すると \(x^{(4)}+\ddot{x}=0\) という 4 階方程式が得られる。</div>
+  </div>
+</div>
+
+<!-- 3-2 -->
+<div class="qcard" id="q13">
+  <div class="qhdr"><span class="qnum">3-2</span>
+    <div class="qtext">
+      \(\overset{...}{x}+\dot{x}=0\) を 1 回微分して得られる 4 階方程式の特性方程式を因数分解すると：<br>
+      \(\lambda^2\,(\lambda^2+\)<span class="blank" id="b13">ア</span>\() = 0\)
+    </div>
+  </div>
+  <div class="choices" id="c13">
+    <button class="cbtn" onclick="ans(13,'c',1)"><span class="lbl">a</span>\(4\)</button>
+    <button class="cbtn" onclick="ans(13,'b',2)"><span class="lbl">b</span>\(-1\)</button>
+    <button class="cbtn" onclick="ans(13,'a',3)"><span class="lbl">c</span>\(1\)</button>
+    <button class="cbtn" onclick="ans(13,'d',4)"><span class="lbl">d</span>\(2\)</button>
+  </div>
+  <div class="fb" id="fb13"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a13')">答えを見る</button></div>
+  <div class="abox" id="a13">
+    <div class="albl">解答・解説</div>
+    <div>\(x^{(4)}+\ddot{x}=0\) に \(x=e^{\lambda t}\) を代入：\(\lambda^4+\lambda^2=0\) → \(\lambda^2(\lambda^2+1)=0\)</div>
+    <div class="expl">根は \(\lambda=0\)（重根）と \(\lambda=\pm i\)（複素根）。</div>
+  </div>
+</div>
+
+<!-- 3-3 -->
+<div class="qcard" id="q14">
+  <div class="qhdr"><span class="qnum">3-3</span>
+    <div class="qtext">
+      根 \(\lambda=0\)（重根）, \(\lambda=\pm i\) から \(x(t)\) の一般解は：<br>
+      \(x(t) = C_1 + C_2 t + C_3\)<span class="blank" id="b14a">ア</span>\(\,t + C_4\)<span class="blank" id="b14b">イ</span>\(\,t\)
+    </div>
+  </div>
+  <div class="choices" id="c14">
+    <button class="cbtn" onclick="ans(14,'c',1)"><span class="lbl">a</span>\(\cos\) と \(\sin\)（\(C_3\) が cos、\(C_4\) が sin）</button>
+    <button class="cbtn" onclick="ans(14,'b',2)"><span class="lbl">b</span>\(e^t\) と \(e^{-t}\)</button>
+    <button class="cbtn" onclick="ans(14,'a',3)"><span class="lbl">c</span>\(\sin\) と \(\cos\)（\(C_3\) が sin、\(C_4\) が cos）</button>
+    <button class="cbtn" onclick="ans(14,'d',4)"><span class="lbl">d</span>\(t\sin\) と \(t\cos\)</button>
+  </div>
+  <div class="fb" id="fb14"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a14')">答えを見る</button></div>
+  <div class="abox" id="a14">
+    <div class="albl">解答・解説</div>
+    <div>\(\lambda=0\)（重根）→ \(C_1+C_2 t\)。\(\lambda=\pm i\) → \(C_3\sin t+C_4\cos t\)。</div>
+    <div class="expl">一般解：\(x(t)=C_1+C_2 t+C_3\sin t+C_4\cos t\)</div>
+  </div>
+</div>
+
+<!-- 3-4 -->
+<div class="qcard" id="q15">
+  <div class="qhdr"><span class="qnum">3-4</span>
+    <div class="qtext">
+      \(x(t)=C_1+C_2 t+C_3\sin t+C_4\cos t\) のとき、\(\dot{y}=\ddot{x}\) から積分すると \(y(t)\) は：<br>
+      \(y(t) = {-C_3}\)<span class="blank" id="b15a">ア</span>\(\,t + C_4\)<span class="blank" id="b15b">イ</span>\(\,t + C_5\)
+    </div>
+  </div>
+  <div class="choices" id="c15">
+    <button class="cbtn" onclick="ans(15,'b',1)"><span class="lbl">a</span>\(\cos\) と \(\sin\)</button>
+    <button class="cbtn" onclick="ans(15,'c',2)"><span class="lbl">b</span>\(\sin\) と \(\cos\)</button>
+    <button class="cbtn" onclick="ans(15,'d',3)"><span class="lbl">c</span>\(\sin\) と \(\sin\)</button>
+    <button class="cbtn" onclick="ans(15,'a',4)"><span class="lbl">d</span>\(\cos\) と \(\cos\)</button>
+  </div>
+  <div class="fb" id="fb15"></div>
+  <div class="arow"><button class="rbtn" onclick="toggleAns('a15')">答えを見る</button></div>
+  <div class="abox" id="a15">
+    <div class="albl">解答・解説</div>
+    <div>
+      \(\dot{x}=C_2-C_3\sin t+C_4\cos t\) → \(\ddot{x}=-C_3\cos t-C_4\sin t\)<br>
+      \(\dot{y}=\ddot{x}\) を積分：\(y=\displaystyle\int(-C_3\cos t-C_4\sin t)\,dt=-C_3\sin t+C_4\cos t+C_5\)
+    </div>
+    <div class="expl">一般解：\(y(t)=-C_3\sin t+C_4\cos t+C_5\)</div>
+  </div>
+</div>
+
+<!-- Tutorial 3 -->
+<div class="tutorial">
+  <div class="ttitle">🔗 連立微分方程式の解法 — ステップバイステップ解説</div>
+  <div class="tintro">2 つの未知関数を持つ連立 ODE を 1 変数の ODE に帰着する方法を解説します。</div>
+
+  <div class="step">
+    <div class="slbl">Step 1</div>
+    <h3>消去法で 1 変数に帰着</h3>
+    <p>2 本の方程式から一方の変数を消去して高階 ODE を作ります。</p>
+    <div class="mblk">$$\begin{cases} \ddot{x} = \dot{y} & \cdots\,\text{(1)} \\ \ddot{y} = -\dot{x} & \cdots\,\text{(2)} \end{cases}$$</div>
+    <p>(1) を \(t\) で微分：\(\overset{...}{x}=\ddot{y}\)。(2) を代入：\(\overset{...}{x}=-\dot{x}\)　→　\(\overset{...}{x}+\dot{x}=0\)</p>
+    <p>さらに 1 回微分：\(x^{(4)}+\ddot{x}=0\)（4 階 ODE）</p>
+  </div>
+
+  <div class="step">
+    <div class="slbl">Step 2</div>
+    <h3>4 階 ODE の特性方程式を解く</h3>
+    <div class="mblk">$$\lambda^4+\lambda^2=0 \;\Rightarrow\; \lambda^2(\lambda^2+1)=0$$</div>
+    <ul>
+      <li>\(\lambda=0\)（2 重根）→ 解の寄与：\(C_1+C_2 t\)</li>
+      <li>\(\lambda=\pm i\)（複素根）→ 解の寄与：\(C_3\sin t+C_4\cos t\)</li>
+    </ul>
+    <div class="mblk">$$x(t)=C_1+C_2 t+C_3\sin t+C_4\cos t$$</div>
+  </div>
+
+  <div class="step">
+    <div class="slbl">Step 3</div>
+    <h3>もう一方の解を積分で求める</h3>
+    <p>\(\dot{y}=\ddot{x}\) を使います。</p>
+    <div class="mblk">$$\ddot{x}=-C_3\cos t-C_4\sin t$$</div>
+    <p>積分：</p>
+    <div class="mblk">$$y=\int\ddot{x}\,dt = -C_3\sin t+C_4\cos t+C_5$$</div>
+    <div class="pbox"><div class="pt">注意</div>積分定数 \(C_5\) は \(x\) の定数とは独立に現れる。元の連立式に代入して整合性を確認すること。</div>
+  </div>
+
+  <div class="step">
+    <div class="slbl">Step 4</div>
+    <h3>一般解のまとめ</h3>
+    <div class="mblk">$$\begin{cases} x(t)=C_1+C_2 t+C_3\sin t+C_4\cos t \\ y(t)=-C_3\sin t+C_4\cos t+C_5 \end{cases}$$</div>
+    <p>初期条件 \(x(0),\,\dot{x}(0),\,y(0),\,\dot{y}(0)\) が与えられれば定数を決定できる。</p>
+  </div>
+
+  <div class="kbox">
+    <div class="kt">🔑 キーポイントまとめ</div>
+    <ul>
+      <li>消去法：一方を微分して代入し 1 変数の高階 ODE に帰着させる</li>
+      <li>重根 \(\lambda=0\) は多項式 \(C_1+C_2 t\) を生む（\(te^{0\cdot t}=t\)）</li>
+      <li>複素根 \(\pm i\) は \(\sin t,\,\cos t\) を生む</li>
+      <li>\(y(t)\) は元の関係式から積分で得る。新たな積分定数が加わる</li>
+    </ul>
+  </div>
+</div>
+</div><!-- /tp2 -->
+
+</main>
+
+<script>
+// ── 正解テーブル（qNum → 選択肢ラベル）──
+const COR = {
+  1:'b', 2:'c', 3:'a', 4:'d',
+  5:'a', 6:'b', 7:'c', 8:'b', 9:'d', 10:'c', 11:'d',
+  12:'c', 13:'c', 14:'c', 15:'b'
+};
+
+// 各問の穴埋め blank ID リスト
+const BLANKS = {
+  1:['b1a','b1b'], 2:['b2a','b2b'], 3:['b3a','b3b'], 4:['b4a','b4b'],
+  5:['b5'], 6:['b6a'], 7:['b7'], 8:['b8a','b8b'], 9:['b9a','b9b'],
+  10:['b10'], 11:['b11a','b11b'],
+  12:['b12'], 13:['b13'], 14:['b14a','b14b'], 15:['b15a','b15b']
+};
+
+let done={}, tc=0, ta=0;
+
+function ans(q, chosen, btnIdx){
+  if(done[q]) return;
+  done[q]=true; ta++;
+  const ok = chosen === COR[q];
+  if(ok) tc++;
+
+  // ボタン操作
+  const btns = document.querySelectorAll(`#c${q} .cbtn`);
+  btns.forEach(b=>b.disabled=true);
+  btns[btnIdx-1].classList.add(ok?'sc':'sw');
+  if(!ok){
+    btns.forEach(b=>{
+      const m=(b.getAttribute('onclick')||'').match(/ans\(\d+,'([^']+)'/);
+      if(m && m[1]===COR[q]) b.classList.add('rc');
+    });
+  }
+
+  // 穴埋め色変え
+  (BLANKS[q]||[]).forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ el.classList.add(ok?'ok2':'ng2'); el.textContent=ok?'✓':'✗'; }
+  });
+
+  // フィードバック
+  const fb=document.getElementById('fb'+q);
+  fb.textContent = ok ? '✅ 正解！' : '❌ 不正解。「答えを見る」で確認しましょう。';
+  fb.className = 'fb '+(ok?'ok':'ng');
+
+  // スコア更新
+  document.getElementById('cc').textContent=tc;
+  document.getElementById('ac').textContent=ta;
+  document.getElementById('rt').textContent=Math.round(tc/ta*100)+'%';
+}
+
+function toggleAns(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('vis');
+  if(el.classList.contains('vis') && window.MathJax){
+    MathJax.typesetPromise([el]).catch(err=>console.log(err));
+  }
+}
+
+function swTab(i){
+  document.querySelectorAll('.tpanel').forEach((p,j)=>p.classList.toggle('active',i===j));
+  document.querySelectorAll('.tbtn').forEach((b,j)=>b.classList.toggle('active',i===j));
+}
+</script>
+</body>
+</html>
